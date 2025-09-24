@@ -1,0 +1,36 @@
+[project]
+name = "phoneme-hubert"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate>=1.7.0",
+    "aiohttp>=3.12.13",
+    "datasets>=3.6.0",
+    "fugashi>=1.3.2",
+    "jiwer>=3.1.0",
+    "librosa>=0.11.0",
+    "numpy>=2.2.6",
+    "pyopenjtalk-plus[onnxruntime]",
+    "pytest>=8.4.0",
+    "pytest-cov>=6.2.1",
+    "scipy>=1.15.3",
+    "soundfile>=0.13.1",
+    "tensorboard>=2.19.0",
+    "torch>=2.7.1",
+    "torchaudio>=2.7.1",
+    "transformers>=4.52.4",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.11.13"]
+
+[tool.uv.sources]
+pyopenjtalk-plus = { git = "https://github.com/prj-beatrice/pyopenjtalk-plus", branch = "split-run-frontend" }
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-select = ["I"]
