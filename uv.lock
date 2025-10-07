@@ -506,6 +506,40 @@ wheels = [
 ]
 
 [[package]]
+name = "flashlight-text"
+version = "0.0.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/b8/83f5a6a5aae7acc9289acd0c1e9ef954ccb881a912019f7bbb35f7d3a4cb/flashlight-text-0.0.7.tar.gz", hash = "sha256:fb63779b4b642c0c59e66386f43db8357836ed1be82b49d30155f7c39136d836", size = 60323, upload-time = "2024-03-23T03:06:35.655Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/6a/7db97f3e0fffbef68e7b41bf21823a0461ac1ded635420ea8fe0befca218/flashlight_text-0.0.7-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9057743c23b9e88af1544e243c54d699f6c3f0dc34a060ad6564a9c3032c64d6", size = 1033172, upload-time = "2024-03-23T03:05:19.448Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/f3/6544f43b1f0deb7f8c581cad8fd28386fa00c5e74eb6da0ae0bb70e055d3/flashlight_text-0.0.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d77dd69aad591fa71af97d12936a1ea53787a040be299f7b11f6152bcc4d6412", size = 910776, upload-time = "2024-03-23T03:39:40.127Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/07/d120dc333a460a7eb3a3dbe90082ac0cd152db38f7199c81f4b8995746b5/flashlight_text-0.0.7-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f8af936d53626d9ea45922efae62cb1775aaa1b65a483d79d3a3a1cc37e2df1e", size = 1247048, upload-time = "2024-03-23T03:39:42.763Z" },
+    { url = "https://files.pythonhosted.org/packages/99/85/2b1e4923391bbb1a979bc4fd2d4a9cde1e2a5e891718115df656936fb8bc/flashlight_text-0.0.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0334181f2da9fba19804f41ea20e0a4b987806a8e0094cdae671c901663eae38", size = 1304523, upload-time = "2024-03-23T03:05:21.979Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/ce/ceb2e7887ab73b874e5f1a5af4082bb1eae62edc194605b51de0eae355a6/flashlight_text-0.0.7-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:707f92ccbf4db4cb0c78db72c2c8893c5499d06fe1ca9b1aacf2e6782bbbd97d", size = 1622831, upload-time = "2024-03-23T03:39:44.826Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/ac/9809e2822c76142f78d2bf1f136c3f6b4994142ff3111a4aab89f6e16291/flashlight_text-0.0.7-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:d27cf946ad67d6acc2f5db187438a71baf2d3a06a39ca2197be41e7ee4e561e0", size = 1683038, upload-time = "2024-03-23T03:05:24.116Z" },
+    { url = "https://files.pythonhosted.org/packages/43/85/5f68675d95fdaa8da6a8ffb6bdd5089c9588748b386a1f6ef8f43b843cf0/flashlight_text-0.0.7-cp310-cp310-win_amd64.whl", hash = "sha256:b452c3a22174f8c036599f53d111d1fd85f1cad68b168a623aecdb355fb87841", size = 493866, upload-time = "2024-03-23T03:05:26.12Z" },
+    { url = "https://files.pythonhosted.org/packages/95/76/049fb2f2b96f2264fd0806a5b3b28466e82a782867a04711db4adcc60e39/flashlight_text-0.0.7-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:b2029d66b620485259dcfe60a3b613e007ba0e1082b89e991b4efc05a12c37f8", size = 1033049, upload-time = "2024-03-23T03:05:28.203Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/68/f25a8555535441330a26a095dda8ca1b22e98f85c786da1e13749d9c5b46/flashlight_text-0.0.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:616976c844e7f542f1b9d3f434b530b87022cd0d20357a2ebb289fe39658d737", size = 910630, upload-time = "2024-03-23T03:39:47.065Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/d6/1cd9203973b6a93566d318bd83c3462a5a994445570c28240174aed50f7c/flashlight_text-0.0.7-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4d3f773b582693e427a3e522125ca1d67d17ae4e90cdec5bbe7d88f6ac6d03ec", size = 1247038, upload-time = "2024-03-23T03:39:49.255Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/8b/e381332f6850fe9d8ba455f460e1f1eae1ed97013c4553ee151d6090c6cb/flashlight_text-0.0.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:712674deb2b5636852dd901400e231a1cb59e84290660b2b4c6166bbe5ba6a1a", size = 1304354, upload-time = "2024-03-23T03:05:30.238Z" },
+    { url = "https://files.pythonhosted.org/packages/11/52/618cf7c7fa47e7a72b89bdc6256fb2dbef7e0a67cf4cfd1266658f748b49/flashlight_text-0.0.7-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:77a281109569dfb2504d78a63244ea3508b9212a822a5ad4e319ec84cb881ab8", size = 1622779, upload-time = "2024-03-23T03:39:51.36Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/78/b40211c63665cf6eb744045f0c35291dedc7dab3f0dbaffc5fbc068d94f0/flashlight_text-0.0.7-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:4bb966cdc87f32af304d50c2d29ab1a34544bea5e4dff653e5c7a804f3b6a331", size = 1683121, upload-time = "2024-03-23T03:05:32.256Z" },
+    { url = "https://files.pythonhosted.org/packages/de/50/61f41b8691281f0d3ca36b8f16275c8809e36c83646eb26710e908a2917c/flashlight_text-0.0.7-cp311-cp311-win_amd64.whl", hash = "sha256:a2ff9b633ffb0b22d25ef4164a03209930f3afb560abdb2e70d34a88275d7385", size = 494238, upload-time = "2024-03-23T03:05:34.391Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/2f/c21521d54160f896443f0fb2dc506af11dc2f2de0183f30f974008864923/flashlight_text-0.0.7-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:1bbc4ac16516a90eab302a0c573484e896a0d337fbc1fac18a8ad2097024c22f", size = 1039494, upload-time = "2024-03-23T03:05:36.519Z" },
+    { url = "https://files.pythonhosted.org/packages/93/10/e58aced1b7b2dd0365696e364841faf87dd37d238c7737c457191a1892ae/flashlight_text-0.0.7-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:be0b68c25c38b518db389bc00e8e637f53cb73e6336d11e50a422dd398bc63a0", size = 913909, upload-time = "2024-03-23T03:39:53.453Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/bd/3d21cdd54c3b58d96284c6c4d3cb4f4f0f44a1a59f7549a460d832b15ed2/flashlight_text-0.0.7-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cbfafc3ed32e5aeec17ac2c14ffbe0f1a8b7cd873a0349859182e546c7246964", size = 1248329, upload-time = "2024-03-23T03:39:55.581Z" },
+    { url = "https://files.pythonhosted.org/packages/30/81/76376714d8ce332203fbe99ea48efc856a7ac9cd222bb76100857f15c3d8/flashlight_text-0.0.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6570039ce70429cecb84ea3c6bae212607c5f0b97c0cd769aed7276ad4a70361", size = 1304673, upload-time = "2024-03-23T03:05:38.149Z" },
+    { url = "https://files.pythonhosted.org/packages/81/c1/27c8aea11e899653df876e29f14a1eff49b446a7cef39de53abb88980bab/flashlight_text-0.0.7-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:c314908d2621d77782ecfda2101f3eb5c516862234135a7765bda146ca23bd0e", size = 1621003, upload-time = "2024-03-23T03:39:58.537Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/3f/dc8eadf6c1851e1bf2aa49fb7999756d6fa49d940955bb21931bcd73207c/flashlight_text-0.0.7-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:61b0c4af1972aabcd986ec5c5c816dd88780d31028202e0f3604b6791c7b7753", size = 1683620, upload-time = "2024-03-23T03:05:40.351Z" },
+    { url = "https://files.pythonhosted.org/packages/32/85/8ee20d7257a32f8b747386e62889571137de756ea06e6eb7e8b94d68c927/flashlight_text-0.0.7-cp312-cp312-win_amd64.whl", hash = "sha256:6c64925076d3465e6162a62db4039fe4c68ce4144daeff1acab41547311f4c56", size = 496885, upload-time = "2024-03-23T03:05:41.926Z" },
+    { url = "https://files.pythonhosted.org/packages/65/98/02e82bd678e57abe7a71ec766e7552edce5a2886e2c0cde71357d9fe352e/flashlight_text-0.0.7-pp310-pypy310_pp73-macosx_10_9_x86_64.whl", hash = "sha256:dae6639a6b1f0f018ce9329277f06443586bf877662a0e354f3c8074830f52aa", size = 1033315, upload-time = "2024-03-23T03:06:14.772Z" },
+    { url = "https://files.pythonhosted.org/packages/80/5a/bce67a85ef35c65e3e8c2311c3b0ba4b38a974f0c117e2408a11696db5e6/flashlight_text-0.0.7-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:2e9245af2dd69725846a8b7aedc08c6421df447f074437f99a3519d714ad05b9", size = 910464, upload-time = "2024-03-23T03:40:21.715Z" },
+    { url = "https://files.pythonhosted.org/packages/95/fc/cb0513a466e8a421ea4b23cb188f48f15cdfeee01a059d752c5788269b78/flashlight_text-0.0.7-pp310-pypy310_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d08a5fd17aa1dbc200560da898bbe7605111b043a85cb655f6429352b045c169", size = 1246619, upload-time = "2024-03-23T03:40:23.617Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/71/ab40f6169a12bd8e26de00d4ccaec4933a82932c5781289a7fd8c040dd89/flashlight_text-0.0.7-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ceb9c09e951a9d8fd6c67ba38124385882ec88489f90609a48d5d6e746e173e1", size = 1305086, upload-time = "2024-03-23T03:06:16.238Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/0b/b4ba6f4a74a55ba7817fb56d0f9b3f17892b22075529b910dfe14b30ca03/flashlight_text-0.0.7-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:9aaee83db3a4935f30daddeb4dc8b2bfa71ac546be8ba0423100ab5ad3da93df", size = 492512, upload-time = "2024-03-23T03:06:17.774Z" },
+]
+
+[[package]]
 name = "flatbuffers"
 version = "25.2.10"
 source = { registry = "https://pypi.org/simple" }
@@ -1464,6 +1498,7 @@ dependencies = [
     { name = "accelerate" },
     { name = "aiohttp" },
     { name = "datasets" },
+    { name = "flashlight-text" },
     { name = "fugashi" },
     { name = "jiwer" },
     { name = "librosa" },
@@ -1489,6 +1524,7 @@ requires-dist = [
     { name = "accelerate", specifier = ">=1.7.0" },
     { name = "aiohttp", specifier = ">=3.12.13" },
     { name = "datasets", specifier = ">=3.6.0" },
+    { name = "flashlight-text", specifier = ">=0.0.7" },
     { name = "fugashi", specifier = ">=1.3.2" },
     { name = "jiwer", specifier = ">=3.1.0" },
     { name = "librosa", specifier = ">=0.11.0" },

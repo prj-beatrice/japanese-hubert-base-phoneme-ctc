@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import aiohttp
-import numpy as np
 import soundfile as sf
 import torch
 from datasets import Audio, load_dataset
@@ -203,17 +202,13 @@ class DataCollatorCTCWithPadding:
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
         candidate_batches: List[List[Dict[str, Any]]] = []
-        candidate_input_features: List[Dict[str, Any]] = []
 
         input_features = []
         for feature in features:
             candidate_batches.append(feature.pop("candidate_data"))
             input_features.append({"input_values": feature.pop("input_values")})
-            candidate_input_features.append(
-                {"input_values": feature.pop("candidate_input_values")}
-            )
-            feature.pop("text", None)
-            feature.pop("sample_id", None)
+            feature.pop("text")
+            feature.pop("sample_id")
 
         batch = self.processor.pad(
             input_features=input_features,
@@ -222,16 +217,7 @@ class DataCollatorCTCWithPadding:
             return_tensors="pt",
         )
 
-        candidate_batch = self.processor.pad(
-            input_features=candidate_input_features,
-            padding=True,
-            return_attention_mask=True,
-            return_tensors="pt",
-        )
-
         batch["candidate_batches"] = candidate_batches
-        batch["candidate_input_values"] = candidate_batch["input_values"]
-        batch["candidate_attention_mask"] = candidate_batch["attention_mask"]
 
         return batch
 
@@ -452,7 +438,7 @@ class ReazonSpeechDataset(IterableDataset):
                     self.log_event("skip", sample_key, reason="no_transcription")
                     continue
 
-                filtering_result = filter_text(text)
+                filtering_result = filter_text(text, sample_key)
                 if filtering_result is not None:
                     stats["text_filter"] += 1
                     self.log_event(
@@ -487,25 +473,8 @@ class ReazonSpeechDataset(IterableDataset):
                     )
                     continue
 
-                # 学習用に生音声をそのまま処理
                 processed_audio = self.processor(
                     audio_array,
-                    sampling_rate=sampling_rate,
-                    return_tensors="pt",
-                    padding=False,
-                )
-
-                # 正解候補の評価にはパディングした音声を使用
-                padding_length = 16000
-                padded_audio = np.concatenate(
-                    [
-                        np.zeros(padding_length, dtype=audio_array.dtype),
-                        audio_array,
-                        np.zeros(padding_length // 2, dtype=audio_array.dtype),
-                    ]
-                )
-                candidate_audio = self.processor(
-                    padded_audio,
                     sampling_rate=sampling_rate,
                     return_tensors="pt",
                     padding=False,
@@ -537,9 +506,6 @@ class ReazonSpeechDataset(IterableDataset):
 
                 yield {
                     "input_values": processed_audio.input_values.squeeze(0).tolist(),
-                    "candidate_input_values": candidate_audio.input_values.squeeze(
-                        0
-                    ).tolist(),
                     "candidate_data": [
                         {
                             "phonemes": candidate.phonemes,

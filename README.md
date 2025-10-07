@@ -20,4 +20,4 @@ make train
 
 ## モデル
 
-学習済みモデル: [prj-beatrice/japanese-hubert-base-phoneme-ctc-v3](https://huggingface.co/prj-beatrice/japanese-hubert-base-phoneme-ctc-v3)
+学習済みモデル: [prj-beatrice/japanese-hubert-base-phoneme-ctc-v4](https://huggingface.co/prj-beatrice/japanese-hubert-base-phoneme-ctc-v4)

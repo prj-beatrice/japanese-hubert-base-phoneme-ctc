@@ -5,6 +5,7 @@ import argparse
 import librosa
 import numpy as np
 import torch
+from torchaudio.models.decoder import ctc_decoder
 from transformers import HubertForCTC, Wav2Vec2Processor
 
 
@@ -24,12 +25,32 @@ def infer_phonemes(
     model.eval()
     with torch.no_grad():
         outputs = model(**inputs)
-        predicted_ids = outputs.logits.argmax(-1)
-        print(f"Predicted IDs shape: {predicted_ids.shape}")
-        phonemes = processor.decode(
-            predicted_ids.squeeze(0), spaces_between_special_tokens=True
-        )
-        return phonemes
+        log_probs = outputs.logits.log_softmax(dim=-1).cpu()
+    id2tok = {i: tok for tok, i in processor.tokenizer.get_vocab().items()}
+    labels = [id2tok[i] for i in range(len(id2tok))]
+    blank_token = id2tok[processor.tokenizer.pad_token_id]
+    decoder = ctc_decoder(
+        lexicon=None,
+        tokens=labels,
+        lm=None,
+        nbest=1,
+        beam_size=10,
+        beam_threshold=10,
+        log_add=True,
+        blank_token=blank_token,
+        sil_token="sil",
+    )
+    hyps = decoder(log_probs)
+    best = hyps[0][0]
+    id_seq = best.tokens
+    phonemes = [labels[i] for i in id_seq]
+    BOUNDARY = {"sil"}
+    while phonemes and phonemes[0] in BOUNDARY:
+        phonemes.pop(0)
+    while phonemes and phonemes[-1] in BOUNDARY:
+        phonemes.pop()
+    phonemes = " ".join(phonemes)
+    return phonemes
 
 
 def main():
@@ -37,7 +58,7 @@ def main():
     parser.add_argument("audio_path", help="音声ファイルのパス")
     parser.add_argument(
         "--model-path",
-        default="prj-beatrice/japanese-hubert-base-phoneme-ctc-v3",
+        default="prj-beatrice/japanese-hubert-base-phoneme-ctc-v4",
         help="モデルのパス",
     )
     args = parser.parse_args()

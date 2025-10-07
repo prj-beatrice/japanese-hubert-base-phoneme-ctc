@@ -66,14 +66,68 @@ PHONEME_VOCAB = [
 ]
 
 
-def filter_text(text: str) -> Optional[str]:
+def filter_text(text: str, file_id: str) -> Optional[str]:
     """学習から除外するテキストかどうかチェック"""
+
+    assert "0" <= file_id[-1] <= "9" or "a" <= file_id[-1] <= "f"
 
     if not text:
         return "Empty text"
-    for word in ["9人", "９人", "九人", "今シーズン", "今大会"]:
+    for word in {
+        "ミュニ",
+        "シミュレ",
+        "行っ",
+        "原因",
+        "満員",
+        "店員",
+        "全員",
+        "会員",
+        "唯一",
+        "洗濯機",
+        "学館",
+        "李克強",
+        "旅客機",
+        "皆",
+        "本当",
+        "ベッド",
+        "ハリウッド",
+        "レッド",
+        "ピラミッド",
+        "スタッド",
+        "キッド",
+        "ハイブリッド",
+        "ポッド",
+        "Pod",
+        "Ｐｏｄ",
+        "パッド",
+        "Pad",
+        "Ｐａｄ",
+        "キューピッド",
+        "グリッド",
+        "ゴッド",
+        "サラブレッド",
+        "バグダッド",
+        "ユナイテッド",
+        "ビビッド",
+        "ヴィヴィッド",
+        "バッグ",
+        "ビッグ",
+        "ダッグ",
+        "ドッグ",
+    }:
         if word in text:
             return f"'{word}' in text"
+    for word, threshold in [
+        ("すみません", "1"),
+        ("行く", "2"),
+        ("ている", "2"),
+        ("蔓延", "4"),
+        ("万円", "4"),
+        ("らな", "8"),
+    ]:
+        if file_id[-1] >= threshold:
+            if word in text:
+                return f"'{word}' in text"
     if "0" in text or "０" in text or "十" in text:
         njd_features = pyopenjtalk.run_frontend(text)
         labels = pyopenjtalk.make_label(njd_features)

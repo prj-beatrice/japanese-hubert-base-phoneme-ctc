@@ -133,8 +133,7 @@ eos-format-chasen2 = EOS\n
         """NJD による処理の結果を追加"""
         for candidate in results["candidates"]:
             njd_result = pyopenjtalk.run_njd_from_mecab(candidate["features"])
-            # 学習時と同様に「言う」の発音を「ユー」に変更
-            for feature in njd_result:
+            for i, feature in enumerate(njd_result):
                 if (
                     (feature["string"] in ["いう", "言う"])
                     and feature["pos"] == "動詞"
@@ -146,6 +145,62 @@ eos-format-chasen2 = EOS\n
                     and feature["pron"] == "イウ"
                 ):
                     feature["pron"] = "ユー"
+                if "チャンピオン" in feature["pron"]:
+                    feature["pron"] = feature["pron"].replace(
+                        "チャンピオン", "チャンピョン"
+                    )
+                if feature["pron"].endswith("ティ") or feature["pron"].endswith("ディ"):
+                    feature["pron"] += "ー"
+                if (
+                    feature["pron"].replace("’", "")
+                    in {
+                        "ウェイター",
+                        "ウェーター",
+                        "ウェイトレス",
+                        "ウェートレス",
+                        "ウェディング",
+                        "ウェイトリフティング",
+                        "ウェートリフティング",
+                        "ウェイトトレーニング",
+                        "ウェートトレーニング",
+                        "ウェスト",
+                        "ウェストミンスター",
+                        "ウェスタン",
+                        "ウェットティッシュ",
+                        "ウェットシート",
+                        "ウェットタオル",
+                        "ウェットスーツ",
+                        "デラウェア",
+                    }
+                    or (
+                        i + 1 < len(njd_result)
+                        and feature["pron"] in ["ウェイト", "ウェート"]
+                        and njd_result[i + 1]["pron"]
+                        in ["リフティング", "トレーニング"]
+                    )
+                    or (
+                        i + 1 < len(njd_result)
+                        and feature["pron"] == "ウェット"
+                        and njd_result[i + 1]["pron"]
+                        in ["ティッシュ", "シート", "タオル", "スーツ"]
+                    )
+                ):
+                    feature["pron"] = feature["pron"].replace("ウェ", "ウエ")
+                if feature["pron"] in ["キレイ", "キレイゴト", "キレイドコロ"]:
+                    feature["pron"] = feature["pron"].replace("キレイ", "キレー")
+                if "エイ" in feature["pron"] and (
+                    "A" in feature["string"] or "Ａ" in feature["string"]
+                ):
+                    feature["pron"] = feature["pron"].replace("エイ", "エー")
+                if "ジェイ" in feature["pron"] and (
+                    "J" in feature["string"] or "Ｊ" in feature["string"]
+                ):
+                    feature["pron"] = feature["pron"].replace("ジェイ", "ジェー")
+                if "ケイ" in feature["pron"] and (
+                    "K" in feature["string"] or "Ｋ" in feature["string"]
+                ):
+                    feature["pron"] = feature["pron"].replace("ケイ", "ケー")
+
             candidate["njd_result"] = njd_result
 
     def _expand_digit_reading(self, results: dict):
@@ -154,6 +209,7 @@ eos-format-chasen2 = EOS\n
         DIGIT_CANDIDATES = {
             "四": [("シ", "シ", 1, 1), ("ヨン", "ヨン", 1, 2)],
             "七": [("シチ", "シチ", 2, 2), ("ナナ", "ナナ", 1, 2)],
+            "八": [("ハチ", "ハチ", 2, 2)],
             "九": [("キュウ", "キュー", 1, 2), ("ク", "ク", 1, 1)],
         }
         for candidate in results["candidates"]:
@@ -215,8 +271,11 @@ class CandidateScorer:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.device = device
 
-        HUBERT_MODEL_NAME = "prj-beatrice/japanese-hubert-base-phoneme-ctc-v2"
-        self.model = HubertForCTC.from_pretrained(HUBERT_MODEL_NAME).to(device)
+        HUBERT_MODEL_NAME = "prj-beatrice/japanese-hubert-base-phoneme-ctc-v3"
+        REVISION = "076b30425082827844a0b2be2f009b5768272761"  # 50k iter
+        self.model = HubertForCTC.from_pretrained(
+            HUBERT_MODEL_NAME, revision=REVISION
+        ).to(device)
         self.wav2vec_processor: Wav2Vec2Processor = Wav2Vec2Processor.from_pretrained(
             HUBERT_MODEL_NAME
         )

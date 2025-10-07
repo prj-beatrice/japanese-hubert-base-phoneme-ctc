@@ -168,23 +168,14 @@ class HubertTrainer(Trainer):
         return self._candidate_scorer
 
     def _prepare_inputs(self, inputs):
-        candidate_batches_raw = inputs.pop("candidate_batches", None)
-
-        candidate_input_values = inputs.pop("candidate_input_values", None)
-        candidate_attention_mask = inputs.pop("candidate_attention_mask", None)
-
-        assert candidate_input_values is not None
-
-        candidate_batches = [
-            [CandidatePhoneme(**entry) for entry in batch]
-            for batch in candidate_batches_raw
-        ]
-
         scorer = self._ensure_candidate_scorer()
         best_candidates = scorer.select_best(
-            candidate_input_values=candidate_input_values,
-            candidate_attention_mask=candidate_attention_mask,
-            batch_candidates=candidate_batches,
+            candidate_input_values=inputs["input_values"],
+            candidate_attention_mask=inputs["attention_mask"],
+            batch_candidates=[
+                [CandidatePhoneme(**entry) for entry in batch]
+                for batch in inputs.pop("candidate_batches")
+            ],
         )
 
         tokenizer = self.data_collator.processor.tokenizer
