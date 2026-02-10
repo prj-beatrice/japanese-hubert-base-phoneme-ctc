@@ -17,7 +17,7 @@ test:
 train:
 	@echo "🚀 学習開始..."
 	uv run accelerate launch train.py \
-		--output_dir outputs/japanese-hubert-base-phoneme-ctc-v4 \
+		--output_dir outputs/japanese-hubert-base-phoneme-ctc-v5 \
 		--per_device_train_batch_size 32 \
 		--max_steps 800000 \
 		--learning_rate 2e-6 \
@@ -34,7 +34,7 @@ train:
 		--dataloader_num_workers 8 \
 		--report_to tensorboard \
 		--push_to_hub \
-		--hub_model_id prj-beatrice/japanese-hubert-base-phoneme-ctc-v4
+		--hub_model_id prj-beatrice/japanese-hubert-base-phoneme-ctc-v5
 	@echo "✅ 学習フロー終了"
 
 # 推論実行
@@ -48,10 +48,10 @@ endif
 	@echo "✅ 推論完了"
 
 # Hubモデルのプロセッサー修正
-# 例: make fix-hub-model HUB_MODEL=prj-beatrice/japanese-hubert-base-phoneme-ctc-v4 BASE_MODEL=rinna/japanese-hubert-base
+# 例: make fix-hub-model HUB_MODEL=prj-beatrice/japanese-hubert-base-phoneme-ctc-v5 BASE_MODEL=rinna/japanese-hubert-base
 fix-hub-model:
 ifndef HUB_MODEL
-	$(error HUB_MODEL変数を指定してください。例: make fix-hub-model HUB_MODEL=prj-beatrice/japanese-hubert-base-phoneme-ctc-v4)
+	$(error HUB_MODEL変数を指定してください。例: make fix-hub-model HUB_MODEL=prj-beatrice/japanese-hubert-base-phoneme-ctc-v5)
 endif
 	@echo "🛠️ Hubモデルを修正します..."
 	uv run python fix_hub_model.py $(HUB_MODEL) $(if $(BASE_MODEL),--base-model $(BASE_MODEL))

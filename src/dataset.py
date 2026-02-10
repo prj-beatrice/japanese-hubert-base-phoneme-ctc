@@ -45,10 +45,16 @@ def create_dataset_logger(log_dir: str = "./dataset_logs"):
             **details,
         }
 
-        # ファイルにシンプル追加（各プロセスは独自ファイルを持つ）
-        with open(log_file, "a") as f:
-            json.dump(log_entry, f)
-            f.write("\n")
+        while True:
+            try:
+                # ファイルにシンプル追加（各プロセスは独自ファイルを持つ）
+                with open(log_file, "a") as f:
+                    json.dump(log_entry, f)
+                    f.write("\n")
+                break
+            except OSError as e:
+                print(f"Logging error: {e}. Retrying in 1 second...")
+                time.sleep(1)
 
     return log_event, log_file
 

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable, Optional
 
 import fugashi
+import kanalizer
 import numpy as np
 import pyopenjtalk
 import torch
@@ -82,7 +83,9 @@ eos-format-chasen2 = EOS\n
         results = self._run_mecab(text, num)
         self._add_mecab_costs(results)
         self._add_njd_result(results)
+        self._expand_alphabet_reading(results)
         self._expand_digit_reading(results)
+        self._expand_kanji_pronunciation(results)
         self._add_phonemes(results)
 
         candidates: list[CandidatePhoneme] = []
@@ -151,6 +154,13 @@ eos-format-chasen2 = EOS\n
                     )
                 if feature["pron"].endswith("ティ") or feature["pron"].endswith("ディ"):
                     feature["pron"] += "ー"
+                if feature["pron"].replace("’", "") in {
+                    "ウィンク",
+                    "ウィルス",
+                    "ウィスキー",
+                    "ウィンナー",
+                }:
+                    feature["pron"] = feature["pron"].replace("ウィ", "ウイ")
                 if (
                     feature["pron"].replace("’", "")
                     in {
@@ -203,6 +213,112 @@ eos-format-chasen2 = EOS\n
 
             candidate["njd_result"] = njd_result
 
+    def _expand_alphabet_reading(self, results: dict):
+        """アルファベットを kanalizer で処理したものを候補に追加する"""
+        new_candidates = []
+
+        ALPHABETS = {
+            zen: han
+            for zen, han in zip(
+                "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ",
+                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+                strict=True,
+            )
+        }
+
+        # fmt: off
+        CONSONANTS = {
+            "Ｂ":"ビー", "Ｃ":"シー", "Ｄ":"ディー", "Ｆ":"エフ", "Ｇ":"ジー",
+            "Ｈ":"エイチ", "Ｊ":"ジェー", "Ｋ":"ケー", "Ｌ":"エル", "Ｍ":"エム",
+            "Ｎ":"エヌ", "Ｐ":"ピー", "Ｑ":"キュー", "Ｒ":"アール", "Ｓ":"エス",
+            "Ｔ":"ティー", "Ｖ":"ブイ", "Ｗ":"ダブリュー", "Ｘ":"エックス", "Ｚ":"ゼット",
+            "ｂ":"ビー", "ｃ":"シー", "ｄ":"ディー", "ｆ":"エフ", "ｇ":"ジー",
+            "ｈ":"エイチ", "ｊ":"ジェー", "ｋ":"ケー", "ｌ":"エル", "ｍ":"エム",
+            "ｎ":"エヌ", "ｐ":"ピー", "ｑ":"キュー", "ｒ":"アール", "ｓ":"エス",
+            "ｔ":"ティー", "ｖ":"ブイ", "ｗ":"ダブリュー", "ｘ":"エックス", "ｚ":"ゼット",
+        }
+        # fmt: on
+
+        def is_capital(c: str) -> bool:
+            return "Ａ" <= c <= "Ｚ"
+
+        KNOWN_WORDS = {
+            "be": "ビー",
+            "nisa": "ニーサ",
+            "spy": "スパイ",
+            "tik": "ティック",
+            "tiktok": "ティックトック",
+            "tiktokker": "ティックトッカー",
+            "to": "トゥー",
+        }
+
+        def kanalizer_convert(word: str) -> str:
+            if word in KNOWN_WORDS:
+                return KNOWN_WORDS[word]
+            return kanalizer.convert(word)
+
+        for candidate in results["candidates"]:
+            candidate: dict[str, Any]
+            njd_result: list[dict[str, Any]] = candidate["njd_result"]
+            expanded = [njd_result]
+            for idx_feature, feature in enumerate(njd_result):
+                if (
+                    feature["pos"] == "フィラー"
+                    and len(feature["string"]) >= 2
+                    and all(c in ALPHABETS for c in feature["string"])
+                    and not all(c in CONSONANTS for c in feature["string"])
+                ):
+                    # AaaAAaaAAAaa -> Aaa A Aaa AA Aaa
+                    words = []
+                    word = ""
+                    for c in reversed(feature["string"]):
+                        if not word:
+                            word = c
+                        elif is_capital(c):
+                            if is_capital(word[0]):
+                                word = c + word
+                            else:
+                                words.append(c + word)
+                                word = ""
+                        else:
+                            if is_capital(word[0]):
+                                words.append(word)
+                                word = c
+                            else:
+                                word = c + word
+                    if word:
+                        words.append(word)
+                    words.reverse()
+
+                    pron = "".join(
+                        "".join(CONSONANTS[c] for c in word)
+                        if all(c in CONSONANTS for c in word)
+                        else kanalizer_convert("".join(ALPHABETS[c] for c in word))
+                        for word in words
+                    )
+
+                    if feature["pron"] != pron:
+                        for e in expanded.copy():
+                            e = e.copy()
+                            e[idx_feature] = e[idx_feature].copy()
+                            e[idx_feature]["read"] = pron
+                            e[idx_feature]["pron"] = pron
+                            e[idx_feature]["acc"] = len(pron) - 1  # 雑
+                            e[idx_feature]["mora_size"] = len(pron)  # 雑
+                            e[idx_feature]["chain_rule"] = "C1"
+                            expanded.append(e)
+            assert len(expanded) >= 1
+            assert expanded[0] is njd_result
+            candidate["alphabet_expanded"] = njd_result
+            candidate["is_alphabet_expanded"] = False
+            new_candidates.append(candidate)
+            for e in expanded[1:]:
+                new_candidate = candidate.copy()
+                new_candidate["alphabet_expanded"] = e
+                new_candidate["is_alphabet_expanded"] = True
+                new_candidates.append(new_candidate)
+        results["candidates"] = new_candidates
+
     def _expand_digit_reading(self, results: dict):
         """数字の読みを複数通りにする"""
         new_candidates = []
@@ -214,7 +330,7 @@ eos-format-chasen2 = EOS\n
         }
         for candidate in results["candidates"]:
             candidate: dict[str, Any]
-            njd_result: list[dict[str, Any]] = candidate["njd_result"]
+            njd_result: list[dict[str, Any]] = candidate["alphabet_expanded"]
             expanded = [njd_result]
             for idx_feature, feature in enumerate(njd_result):
                 if (
@@ -223,8 +339,7 @@ eos-format-chasen2 = EOS\n
                     and feature["string"] in DIGIT_CANDIDATES
                 ):
                     digit_features = DIGIT_CANDIDATES[feature["string"]]
-                    expanded_old = expanded
-                    expanded = expanded_old.copy()
+                    expanded_old = expanded.copy()
                     for read, pron, acc, mora_size in digit_features:
                         if feature["pron"] != pron:
                             for e in expanded_old:
@@ -248,10 +363,58 @@ eos-format-chasen2 = EOS\n
                 new_candidates.append(new_candidate)
         results["candidates"] = new_candidates
 
+    def _expand_kanji_pronunciation(self, results: dict):
+        """漢字の読みを複数通りにする"""
+        new_candidates = []
+        KANJI_CANDIDATES = {
+            "全員": ["ゼンイン", "ゼーイン", "ゼイイン"],
+            "店員": ["テンイン", "テーイン", "テイイン"],
+            "原因": ["ゲンイン", "ゲーイン", "ゲイイン"],
+            "満員": ["マンイン", "マーイン"],
+            "会員": ["カイイン", "カーイン"],
+            "唯一": ["ユイイツ", "ユーイツ"],
+            "洗濯機": ["センタク’キ", "センタッキ"],
+            "李克強": ["リコクキョー", "リコッキョー"],
+            "本当": ["ホントー", "ホント"],
+        }
+        for candidate in results["candidates"]:
+            candidate: dict[str, Any]
+            njd_result: list[dict[str, Any]] = candidate["digit_expanded"]
+            expanded = [njd_result]
+            remove_candidate = False
+            for idx_feature, feature in enumerate(njd_result):
+                if "皆" in feature["string"] and "ミンナ" in feature["pron"]:
+                    remove_candidate = True
+                    break
+                if feature["string"] in KANJI_CANDIDATES:
+                    for pron in KANJI_CANDIDATES[feature["string"]]:
+                        if feature["pron"] != pron:
+                            for e in expanded.copy():
+                                e = e.copy()
+                                e[idx_feature] = e[idx_feature].copy()
+                                e[idx_feature]["pron"] = pron
+                                if pron == "ホント":
+                                    e[idx_feature]["mora_size"] = 3
+                                expanded.append(e)
+            if remove_candidate:
+                continue
+            assert len(expanded) >= 1
+            assert expanded[0] is njd_result
+            candidate["kanji_expanded"] = njd_result
+            candidate["is_kanji_expanded"] = False
+            new_candidates.append(candidate)
+            for e in expanded[1:]:
+                new_candidate = candidate.copy()
+                new_candidate["kanji_expanded"] = e
+                new_candidate["is_kanji_expanded"] = True
+                new_candidates.append(new_candidate)
+        if new_candidates:
+            results["candidates"] = new_candidates
+
     def _add_phonemes(self, results: dict):
         """音素列等を追加"""
         for candidate in results["candidates"]:
-            postprocessed = deepcopy(candidate["digit_expanded"])
+            postprocessed = deepcopy(candidate["kanji_expanded"])
             # modify_kanji_yomi は使わない
             postprocessed = pyopenjtalk.modify_filler_accent(postprocessed)
             postprocessed = pyopenjtalk.retreat_acc_nuc(postprocessed)
@@ -271,8 +434,8 @@ class CandidateScorer:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.device = device
 
-        HUBERT_MODEL_NAME = "prj-beatrice/japanese-hubert-base-phoneme-ctc-v3"
-        REVISION = "076b30425082827844a0b2be2f009b5768272761"  # 50k iter
+        HUBERT_MODEL_NAME = "prj-beatrice/japanese-hubert-base-phoneme-ctc-v4"
+        REVISION = "main"
         self.model = HubertForCTC.from_pretrained(
             HUBERT_MODEL_NAME, revision=REVISION
         ).to(device)

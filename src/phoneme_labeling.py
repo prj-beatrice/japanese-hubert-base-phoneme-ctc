@@ -73,61 +73,28 @@ def filter_text(text: str, file_id: str) -> Optional[str]:
 
     if not text:
         return "Empty text"
-    for word in {
-        "ミュニ",
-        "シミュレ",
-        "行っ",
-        "原因",
-        "満員",
-        "店員",
-        "全員",
-        "会員",
-        "唯一",
-        "洗濯機",
-        "学館",
-        "李克強",
-        "旅客機",
-        "皆",
-        "本当",
-        "ベッド",
-        "ハリウッド",
-        "レッド",
-        "ピラミッド",
-        "スタッド",
-        "キッド",
-        "ハイブリッド",
-        "ポッド",
-        "Pod",
-        "Ｐｏｄ",
-        "パッド",
-        "Pad",
-        "Ｐａｄ",
-        "キューピッド",
-        "グリッド",
-        "ゴッド",
-        "サラブレッド",
-        "バグダッド",
-        "ユナイテッド",
-        "ビビッド",
-        "ヴィヴィッド",
-        "バッグ",
-        "ビッグ",
-        "ダッグ",
-        "ドッグ",
-    }:
+    for word in ["学館", "言っ", "蔓延", "万円", "何か", "この間", "このあいだ"]:
         if word in text:
             return f"'{word}' in text"
     for word, threshold in [
         ("すみません", "1"),
+        ("ミュニ", "1"),
+        ("シミュレ", "1"),
         ("行く", "2"),
         ("ている", "2"),
-        ("蔓延", "4"),
-        ("万円", "4"),
+        ("延々", "4"),
         ("らな", "8"),
     ]:
         if file_id[-1] >= threshold:
             if word in text:
                 return f"'{word}' in text"
+    if "皆" in text:
+        njd_features = pyopenjtalk.run_frontend(text)
+        labels = pyopenjtalk.make_label(njd_features)
+        prons = "-".join(map(lambda s: s.split("-")[1].split("+")[0], labels[1:-1]))
+        if "m-i-N-n-a" in prons:
+            return "'皆' in text"
+
     if "0" in text or "０" in text or "十" in text:
         njd_features = pyopenjtalk.run_frontend(text)
         labels = pyopenjtalk.make_label(njd_features)
